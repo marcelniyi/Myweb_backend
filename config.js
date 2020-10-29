@@ -7,5 +7,5 @@ export const config = {
     port: process.env.NODE_ENV === 'test' ? 3001 : process.env.PORT,
     dbName,
     host: process.env.BASE_URL,
-    dbUrl: process.env.MONGODB_URL + `/${dbName}`
+    dbUrl: process.env.MONGODB_URL || process.env.MONGODB_URL + `/${dbName}`
 }

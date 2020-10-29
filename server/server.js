@@ -2,11 +2,20 @@ import express from 'express';
 import dotenv from 'dotenv';
 import routers from './routes/route';
 import joiErrors from './middlewares/joiErrors';
+import mongoose from 'mongoose';
+import {config} from '../config';
 
+const database = config.dbUrl;
+const app = express();
+mongoose.connect(database, {useNewUrlParser: true, useUnifiedTopology: true});
+const db = mongoose.connection;
 
 dotenv.config(); // Sets environment's varibles
 
-const app = express();
+db.on('error', console.error.bind(console, "connection Error"))
+db.once('open', () => {
+  //console.log("DB is connected")
+})
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

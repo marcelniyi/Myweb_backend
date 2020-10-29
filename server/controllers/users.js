@@ -1,65 +1,101 @@
-/* eslint consistent-return: 0 */
 import Users from '../models/user';
-import Auth from '../helpers/auth';
-import Pool from '../db/index';
+import jwt from 'jsonwebtoken';
+import {
+  passwordHash,
+  passwordCompare,
+  generateToken }
+from '../helpers/auth';
+import { user } from '../validations/user.validation';
+
+export const userRegister = async(req, res) => {
+  const newUser = req.body;
+  const {error} = user(newUser);
+    if (error){
+        res.status(400).json({
+            message: error.details[0].message
+        })
+        return false;
+    }
+    const exist = await Users.findOne({ email: newUser.email});
+    if(exist){
+      res.status(409).json({ errer: "User already exist"})
+      return
+    }
+    const addUser = new Users({
+      firstname: newUser.firstname,
+      lastname: newUser.lastname,
+      email: newUser.email,
+      password: passwordHash(newUser.password),
+    })
+    try {
+      const result = await addUser.save();
+      res.status(201).json({
+                message: 'Account created!',
+                Body: result
+            });
+    }catch(err) {
+      throw new Error(err);
+    }
+
+}
 
 
-class User {
-  // Register the User
-  static async register(req, res) {
-    const newUser = Users.createUser(req.body);
-    const token = Auth.generateToken(req.body.id);
-    newUser.then((user) => {
-      if (!user) {
-        return res.status(400).send({
-          status: 400,
-          error: 'user exists',
-        });
-      }
-      return res.status(201).send({
-        status: 201,
-        data: [{
+export const userLogin = async(req, res) => {
+  const { email, password} = req.body;
+  if(password && email){
+    const userCreadentials = await Users.findOne({ email});
+    if(!userCreadentials) return res.status(400).json({error: 'Invalid Email or Password!'})
+    const userInfo = {
+      email: userCreadentials.email,
+      isadmin: userCreadentials.isadmin,
+      id: userCreadentials._id,
+    }
+
+    const pass = passwordCompare(userCreadentials.password, password)
+    if(pass){
+      const token = generateToken(userInfo);
+      return res.status(200).json({
+          message: 'Logged in successfully!',
+          user: userInfo,
           token,
-          user,
-        }],
-      });
-    });
-  }
-
-  // login the user
-  static async login(req, res) {
-    const { email, password } = req.body;
-    const queryText = ' SELECT * FROM users WHERE email = $1 LIMIT 1';
-    const data = [email];
-    Pool.query(queryText, data)
-      .then((response) => {
-        if (!response) {
-          return res.status(404).send({
-            status: 404,
-            error: 'User not found',
-          });
-        }
-        const checkPassword = Auth.passwordCompare(response.rows[0].password, password);
-        if (checkPassword) {
-          const payload = {
-            id: res.id,
-            email: res.email,
-            isadmin: res.isadmin,
-          };
-          delete payload.password;
-          const token = Auth.generateToken(payload);
-          return res.status(200).send({
-            status: 200,
-            token,
-            user: response.rows[0],
-          });
-        }
-      }).catch((err) => {
-        res.status(500).send({
-          status: 500,
-          error: 'internal server error',
         });
-      });
+    }
+
+  } else {
+    res.status(400).json({errer: "Provide email and password"})
   }
 }
-export default User;
+
+
+export const updateProfile = async (req, res) => {
+
+      const userInfo = req.body;
+
+        const exist = await Users.findById(req.data.user.id);
+        const addBlog = new Articles({
+          firstname: userInfo.firstname,
+          lastname: userInfo.lastname,
+          phone: blog.descriptions,
+          image: blog.image,
+        })
+        try {
+          const result = await addBlog.save();
+          res.status(201).json({
+            message: 'blog added successfully',
+            result
+          });
+        }catch(err) {
+          throw new Error(err);
+        }
+}
+
+export const listUsers = async (req, res) => {
+        try {
+          const users = await Users.find({});
+          res.status(201).json({
+            users: users
+          });
+        }catch(err) {
+          throw new Error(err);
+        }
+}

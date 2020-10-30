@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 import {config} from '../../config';
 
 const databaseName = config.dbUrl;
-process.env.MONGODB_URL = 'mongodb://localhost';
+process.env.MONGODB_URL = 'mongodb://localhost/testing_db';
 import Articles from '../models/articles';
 import { generateToken } from '../helpers/testingAuth'
 

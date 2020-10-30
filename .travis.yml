@@ -7,9 +7,6 @@ node_js:
 
 services:
   - mongodb
-  
-before_script:
-  - sudo /etc/init.d/mongod start
 
 script:
   - npm run test:coveralls

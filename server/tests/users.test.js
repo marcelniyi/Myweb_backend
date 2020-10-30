@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import {config} from '../../config';
 
 const databaseName = config.dbUrl;
+process.env.MONGODB_URL = 'mongodb://localhost';
 import Users from '../models/user';
 
 describe('User registration', () => {

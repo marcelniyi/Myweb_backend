@@ -1,11 +1,18 @@
-language : node_js
-node_js :
-  - "10.14.1"
-before_script:
-  - psql -c "create user shema with PASSWORD 'shema';" -U postgres
-  - psql -c 'create database politico;' -U postgres
-  - psql -c 'create database politico_test;' -U postgres
-script :
-  - npm install
+sudo: false
+
+language: node_js
+
+node_js:
+  - 'stable'
+
+services:
+  - mongodb
+
+script:
+  - npm run test:coveralls
+
 after_success :
   - npm run coverage
+
+notifications:
+  email: false

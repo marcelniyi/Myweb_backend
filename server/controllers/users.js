@@ -69,19 +69,17 @@ export const userLogin = async(req, res) => {
 
 export const updateProfile = async (req, res) => {
 
-      const userInfo = req.body;
-
+        const userInfo = req.body;
         const exist = await Users.findById(req.data.user.id);
-        const addBlog = new Articles({
-          firstname: userInfo.firstname,
-          lastname: userInfo.lastname,
-          phone: blog.descriptions,
-          image: blog.image,
+
+        const addBlog = new Users({
+          firstname: userInfo.firstname || exist.firstname,
+          lastname: userInfo.lastname || exist.lastname,
         })
         try {
           const result = await addBlog.save();
           res.status(201).json({
-            message: 'blog added successfully',
+            message: 'profile updated successfully',
             result
           });
         }catch(err) {
@@ -90,10 +88,27 @@ export const updateProfile = async (req, res) => {
 }
 
 export const listUsers = async (req, res) => {
+        if(!req.data.user.isadmin) return res.status(409).json({error: 'Login as admin'})
         try {
           const users = await Users.find({});
           res.status(201).json({
             users: users
+          });
+        }catch(err) {
+          throw new Error(err);
+        }
+}
+
+
+export const userChangeRole = async (req, res) => {
+        //if(!req.data.user.isadmin) return res.status(409).json({error: 'Login as admin'})
+        const exist = await Users.findById(req.id);
+        const addBlog = new Users({isadmin: req.body.isadmin})
+        try {
+          const result = await addBlog.save();
+          res.status(201).json({
+            message: 'User granted successfully',
+            result
           });
         }catch(err) {
           throw new Error(err);

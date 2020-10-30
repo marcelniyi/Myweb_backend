@@ -1,3 +1,4 @@
+process.env.MONGODB_URL = 'mongodb://localhost/testing_db';
 import app from "../app"; // Link to your server file
 import supertest from "supertest";
 const request = supertest(app);
@@ -6,7 +7,7 @@ import mongoose from 'mongoose';
 import {config} from '../../config';
 
 const databaseName = config.dbUrl;
-process.env.MONGODB_URL = 'mongodb://localhost/testing_db';
+
 import Users from '../models/user';
 
 describe('User registration', () => {

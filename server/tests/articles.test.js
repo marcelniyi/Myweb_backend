@@ -7,7 +7,7 @@ import {config} from '../../config';
 
 const databaseName = config.dbUrl;
 import Articles from '../models/articles';
-import { generateToken } from '../helpers/auth'
+import { generateToken } from '../helpers/testingAuth'
 
 
 const token = generateToken({
